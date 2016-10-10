@@ -66,10 +66,10 @@ Although Zabbix DOES allow you to configure items / triggers / graphs etc agains
 ### Retention
 The size of your database (and workload on the server) can be calculated as `N * (H + T) * F` (__N__: number-of-items-monitored, __H__: history-retention, __T__: trends-retention, __F__: check-frequency).
 
-* "History" is raw data as it was collected from the agents. Setting 7-days history for an item means that every value recorded will be kept for 7 days before being down-sampled into a trend, and purged from the history tables.
-* "Trends" is pre-aggregated data derived from history. The "housekeeping" processes take the history, down-sample it into the trends tables, and clean it out. Keeping your history as trends is usually just as effective as history, but uses a fraction of the storage.
+* "__History__" is raw data as it was collected from the agents. Setting 7-days history for an item means that every value recorded will be kept for 7 days before being down-sampled into a trend, and purged from the history tables.
+* "__Trends__" is pre-aggregated data derived from history. The "housekeeping" processes take the history, down-sample it into the trends tables, and clean it out. Keeping your history as trends is usually just as effective as history, but uses a fraction of the storage.
 * When you look at historic graphs the data is automatically combined from history and trends (you'll probably notice the lower resolution of the trends data).
-* Always try to reduce the frequency of your monitoring to extend the life of your database. Of course, you still need some history for diagnosing performance issues and capacity planning. Here are some rules-of-thumb:
+* Always try to __reduce the frequency of your monitoring to extend the life of your database__. Of course, you still need some history for diagnosing performance issues and capacity planning. Here are some rules-of-thumb:
   - FileSystems (used): F:300s, H:30d, T:1y
   - FileSystems (total): F: 900S, H:7d, T:1y
   - CPU: F:60s, H:7d, T:90d
@@ -96,4 +96,4 @@ I always prefer to use PUSH monitoring wherever possible.
 
 ### General advice
 * Don't include items that will never be available on a host - these are still checked from time to time by zabbix, so they use resources.
-* The default templates retrieve a lot of data, and they do it at high frequency. If you tried to monitor 500 servers with this config you'd very quickly fill up the database. You shouldn't ask "how often can I check this"... instead ask "how infrequently can I check this and still get the monitoring I need".
+* The default templates retrieve a lot of data, and they do it at high frequency. If you tried to monitor 500 servers with this config you'd very quickly fill up the database. You shouldn't ask "how often can I check this"... instead ask "__how infrequently can I check this and still get the monitoring I need__".

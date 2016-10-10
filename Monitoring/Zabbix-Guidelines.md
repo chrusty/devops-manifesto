@@ -6,12 +6,12 @@ Aims
 ----
 These should be the overall aims for anyone considering a new Zabbix installation.
 
-* High availability (Zabbix should be available all of the time, or as close as we can manage)
-* High performance (Zabbix should be able to monitor everything you intend to have, even with 24 months worth of history in the DB)
-* Operational simplicity (as simple as possible anyway)
-* Consistency (Conventions should be applied and observed across the board to make this as easy to understand as possible)
-* Repeatability (Various components should be able to be rebuilt automatically without requiring hand-crafted configurations)
-* Longevity (The installation should be able to run for the next 2 years without requiring a massive overhaul)
+* __High availability (Zabbix should be available all of the time, or as close as we can manage)
+* __High performance (Zabbix should be able to monitor everything you intend to have, even with 24 months worth of history in the DB)
+* __Operational simplicity__ (as simple as possible anyway)
+* __Consistency__ (Conventions should be applied and observed across the board to make this as easy to understand as possible)
+* __Repeatability__ (Various components should be able to be rebuilt automatically without requiring hand-crafted configurations)
+* __Longevity__ (The installation should be able to run for the next 2 years without requiring a massive overhaul)
 
 Guidelines
 ----------
@@ -19,15 +19,15 @@ The following sections carry some advice for how to approach each part of your Z
 
 ### The server database
 The database for the Zabbix server is core to the entire platform. Zabbix's architecture doesn't allow for multiple active servers, which means that our efforts need to be focused here.
-* MySQL is the "default" database engine for Zabbix, and I suggest you stick with it.
-* My first choice would be to run a multi-AZ RDS for the Zabbix database. If you make this choice, be careful to select a version of MySQL that Zabbix is known to work with.
+* __MySQL__ is the "default" database engine for Zabbix, and I suggest you stick with it.
+* My first choice would be to run a __multi-AZ RDS__ for the Zabbix database. If you make this choice, be careful to select a version of MySQL that Zabbix is known to work with.
 * The database will start off small, but will increase in size constantly until all of your data has reached its maximum retention time, or you truncate the history tables.
-* I was able to monitor 500 instances and retain 12 months worth of history with a 50GB database, but this was only possible because I was very careful about moving data from history to trends, and reducing check frequencies.
-* For safety's sake start with at least 100GB.
+* I was able to monitor 500 instances and retain 12 months worth of history with a 50GB database, but this was only possible because I was very __careful about moving data from history to trends, and reducing check frequencies__.
+* For safety's sake start with at least __100GB__.
 
 ### The Zabbix Server
 The "server" really refers to the Zabbix-Server process, but this needs to run somewhere so we can call that instance the "server" too.
-* Make sure that the installation and configuration of the server is FULLY automated. Probably the best way is to create an AMI or an EBS snapshot once the software is installed. This means you could then run this in an autoscaling group, and know that whenever you decide to rebuild this instance (or it dies for whatever reason), a new one will come back as quickly as possible and start working again.
+* Make sure that the installation and configuration of the server is __FULLY automated__. Probably the best way is to create an AMI or an EBS snapshot once the software is installed. This means you could then run this in an autoscaling group, and know that whenever you decide to rebuild this instance (or it dies for whatever reason), a new one will come back as quickly as possible and start working again.
 * In general I don't recommend changing configurations from the default unless you know that you have to do it. The configurations I DO suggest changing for the Zabbix-server process are:
   - StartTrappers=10
   - StartHTTPPollers=10
@@ -57,14 +57,19 @@ Proxies are one of the best features of Zabbix. This is what they call "distribu
 
 ### Templates
 Although Zabbix DOES allow you to configure items / triggers / graphs etc against individual hosts, this is a terrible idea because you'll end up having to copy these around each time you build a similar host. Instead, items / triggers / graphs etc can be defined once and for all in "Templates", which can be applied to hosts (or groups).
-* You should never end up defining an item / trigger / graph more than once. Put these into templates instead.
+* __You should never end up defining an item / trigger / graph more than once__. Put these into templates instead.
 * Each host can belong to many templates, but this gets complicated when it comes to auto-discovery or auto-registration of hosts.
 * Instead, break your list of hosts up into "roles" and make one template per role.
 * Build each role template by linking in whatever other templates you need, for example the "zabbix-frontend" role template could include sub-templates like "OS - Linux" + "App - Apache".
 * This means you can re-cycle the "OS - Linux" + "App - Apache" templates as many times as you like.
 
 ### Retention
-The size of your database (and workload on the server to handle the throughput) can be calculated as "number-of-items-monitored * (retention-history + retention-trends) * check-frequency".
+The size of your database (and workload on the server to handle the throughput) can be calculated as `N * (H + T) * F` where
+* __N__: number-of-items-monitored
+* __H__: history-retention
+* __T__: trends-retention
+* __F__: check-frequency
+
 * "History" is raw data as it was collected from the agents. Setting 7-days history for an item means that every value recorded will be kept for 7 days before being down-sampled into a trend, and purged from the history tables.
 * "Trends" is pre-aggregated data derived from history. The "housekeeping" processes take the history, down-sample it into the trends tables, and clean it out. Keeping your history as trends is usually just as effective as history, but uses a fraction of the storage.
 * When you look at historic graphs the data is automatically combined from history and trends (you'll probably notice the lower resolution of the trends data).

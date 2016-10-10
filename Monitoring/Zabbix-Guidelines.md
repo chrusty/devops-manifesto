@@ -75,6 +75,9 @@ The size of your database (and workload on the server to handle the throughput) 
   - Memory: F: 300s, H:7d, T:90d
 
 ### User accounts & groups
+If you DO end up needing to provision accounts for individual users, I strongly suggest that you don't define any actions against specific accounts - use groups instead.
+* In all but the most ridiculous environments it's usually OK to provision generic unprivileged accounts for administrative groups of people to see the dashboard.
+* You'll also need some of these accounts to leave logged in to screens dotted around the office.
 
 ### Alerting
 Although Zabbix CAN handle alerts & escalations, I strongly advise you to ignore this and simply forward notifications to an external service like PagerDuty, and manage your alerts & rotas from there. It is much easier than provisioning user accounts on Zabbix, and needs to be done anyway.

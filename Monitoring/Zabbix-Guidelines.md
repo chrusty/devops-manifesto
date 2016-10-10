@@ -6,8 +6,8 @@ Aims
 ----
 These should be the overall aims for anyone considering a new Zabbix installation.
 
-* __High availability (Zabbix should be available all of the time, or as close as we can manage)
-* __High performance (Zabbix should be able to monitor everything you intend to have, even with 24 months worth of history in the DB)
+* __High availability__ (Zabbix should be available all of the time, or as close as we can manage)
+* __High performance__ (Zabbix should be able to monitor everything you intend to have, even with 24 months worth of history in the DB)
 * __Operational simplicity__ (as simple as possible anyway)
 * __Consistency__ (Conventions should be applied and observed across the board to make this as easy to understand as possible)
 * __Repeatability__ (Various components should be able to be rebuilt automatically without requiring hand-crafted configurations)
@@ -64,11 +64,7 @@ Although Zabbix DOES allow you to configure items / triggers / graphs etc agains
 * This means you can re-cycle the "OS - Linux" + "App - Apache" templates as many times as you like.
 
 ### Retention
-The size of your database (and workload on the server to handle the throughput) can be calculated as `N * (H + T) * F` where
-* __N__: number-of-items-monitored
-* __H__: history-retention
-* __T__: trends-retention
-* __F__: check-frequency
+The size of your database (and workload on the server) can be calculated as `N * (H + T) * F` (__N__: number-of-items-monitored, __H__: history-retention, __T__: trends-retention, __F__: check-frequency).
 
 * "History" is raw data as it was collected from the agents. Setting 7-days history for an item means that every value recorded will be kept for 7 days before being down-sampled into a trend, and purged from the history tables.
 * "Trends" is pre-aggregated data derived from history. The "housekeeping" processes take the history, down-sample it into the trends tables, and clean it out. Keeping your history as trends is usually just as effective as history, but uses a fraction of the storage.

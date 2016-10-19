@@ -69,9 +69,9 @@ Insert one user into the users table. For the benefit of further steps please us
 
 #### Check which files are holding your data
 Use the same “sstableutil” command to list the files holding data for this table. Unless you’ve waited a VERY long time since the previous step, there will still be no files on disk for this table. Why has this happened?
-* Your data is currently held in-memory and in the commit-logs.
-* Time and / or throughput will eventually cause this to be flushed to an SSTable file.
-* We can also manually cause your data to be flushed to disk.
+* Your data is currently held [in-memory](https://wiki.apache.org/cassandra/MemtableSSTable) and in the [commit-logs](http://wiki.apache.org/cassandra/Durability).
+* Time and / or throughput will eventually cause this to be flushed to an [SSTable](http://wiki.apache.org/cassandra/ArchitectureSSTable) file.
+* We can also manually cause your data to be [flushed](https://docs.datastax.com/en/cassandra/2.1/cassandra/tools/toolsFlush.html) to disk.
 * Even though your data is currently not in an SSTable file it CAN still be queried - don’t worry!
 
 

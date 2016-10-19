@@ -9,9 +9,10 @@ In this exercise you will explore how data is distributed in a multi-node cluste
 
 Goals
 -----
-* Understand how a cluster is assembled
-* Learn how to query the cluster membership state
-* Learn how to replace a node
+* Understand how partitions are distributed using tokens for their keys
+* Experience the relationship between replication-factor and distribution
+* Explore failure scenarios using different combinations of replication and consistency
+* Witness how inconsistent data can be repaired automatically and manually
 
 
 Pre-requisites

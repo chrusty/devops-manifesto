@@ -91,8 +91,9 @@ Restoring data is quite simple too, and generally follows this procedure:
 * Use the ```sstableloader``` command to load the data you want to restore. It will distribute it around your cluster, and ensure that you end up with the correct number of replicas.
 
 
-Emergencies
+## Emergencies
 -----------
+
 Hopefully you will make it through your life without ever having to deal with an emergency in a distributed-database (known in some circles as a "_cluster-f&^k_"). You can generally avoid this by heeding this advice:
 * Run all code-changes through dev / staging / load-test BEFORE running them in production.
 * Load-test all code-changes BEFORE running them in production.

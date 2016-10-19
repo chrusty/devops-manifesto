@@ -87,7 +87,7 @@ Restoring data is quite simple too, and generally follows this procedure:
 * Create the schemas you need for the tables being restored.
 * Identify which files you need to restore.
 * Copy them to a node in your Cassandra cluster.
-* Move the files you want into a directory called "___<keyspace>/<table>___" (the next command requires this).
+* Move the files you want into a directory called "<keyspace>/<table>" (the next command requires this).
 * Use the ```sstableloader``` command to load the data you want to restore. It will distribute it around your cluster, and ensure that you end up with the correct number of replicas.
 
 

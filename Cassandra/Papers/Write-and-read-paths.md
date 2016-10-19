@@ -44,7 +44,7 @@ The first part of the process is to figure out which node(s) are responsible for
    * Enough replicas have responded successfully to the coordinator node to satisfy the consistency-level of the original request (in which case a successful response is returned to the client).
    * A timeout is reached (or errors received) while waiting for responses (in which case a negative response is returned to the client).
 
-![Write-lath](write-path.gif "The write-path (as a cluster)")
+![Write-lath](images/write-path.gif "The write-path (as a cluster)")
 
 
 ### On each replica

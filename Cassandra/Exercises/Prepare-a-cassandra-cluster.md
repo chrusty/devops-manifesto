@@ -22,13 +22,13 @@ Useful Commands
 ### Get the logs from a container
 ```docker logs <container-name/id>```
 
-### Run “nodetool status” in one of your Cassandra containers
+### Run "nodetool status" in one of your Cassandra containers
 ```docker exec -it <container-name/id> nodetool status```
 
-### Run “cqlsh” in one of your Cassandra containers
+### Run "cqlsh" in one of your Cassandra containers
 ```docker exec -it <container-name/id> cqlsh```
 
-### Run “bash” in one of your Cassandra containers
+### Run "bash" in one of your Cassandra containers
 ```docker exec -it <container-name/id> bash```
 
 
@@ -46,17 +46,17 @@ The first thing to do is to make a docker network specifically for Cassandra con
 
 
 #### Bring up a single-node cluster
-Now you can bring up your first Cassandra node (172.16.0.11). This container will be called “cassandra-1”.
+Now you can bring up your first Cassandra node (172.16.0.11). This container will be called "cassandra-1".
 ```docker run --net=cassandra --ip=172.16.0.11 --name=cassandra-1 -d cassandra:3.7```
 
 
 #### Check the status of your single-node cluster
-Your new node will take a couple of seconds to come up. Check the docker logs for the container, and once it looks like it is running you can use nodetool to print out the cluster membership (at this stage you should only see one node). Any node with a “UN” status is UP and NORMAL.
+Your new node will take a couple of seconds to come up. Check the docker logs for the container, and once it looks like it is running you can use nodetool to print out the cluster membership (at this stage you should only see one node). Any node with a "UN" status is UP and NORMAL.
 ```docker exec -it cassandra-1 nodetool status```
 
 
 #### Introduce a second node
-If your single-node cluster is running then you should now be able to introduce a second node. Again watch the logs to see how the node goes about joining, and use nodetool to check the cluster membership (note that you can do this on either of the nodes). Notice how we can pass configuration options to Cassandra with the Docker run command (in this case the [seed-list](https://docs.datastax.com/en/cassandra/2.1/cassandra/configuration/configCassandra_yaml_r.html#reference_ds_qfg_n1r_1k__seed_provider)). If you run “nodetool status” quick enough you may get to see the original node in “UN” status, and the new one in “UJ” (UP and JOINING) before they eventually both report “UN”.
+If your single-node cluster is running then you should now be able to introduce a second node. Again watch the logs to see how the node goes about joining, and use nodetool to check the cluster membership (note that you can do this on either of the nodes). Notice how we can pass configuration options to Cassandra with the Docker run command (in this case the [seed-list](https://docs.datastax.com/en/cassandra/2.1/cassandra/configuration/configCassandra_yaml_r.html#reference_ds_qfg_n1r_1k__seed_provider)). If you run "nodetool status" quick enough you may get to see the original node in "UN" status, and the new one in "UJ" (UP and JOINING) before they eventually both report "UN".
 ```docker run --net=cassandra --ip=172.16.0.12 --name=cassandra-2 -d -e CASSANDRA_SEEDS=172.16.0.11 cassandra:3.7```
 
 
@@ -80,7 +80,7 @@ You can now use the docker start command to bring the cassandra-2 container back
 
 #### Consider the implications of a node temporarily going offline
 Cassandra is designed to gracefully handle nodes temporarily going offline (this is how we would do scheduled maintenance and deal with hardware failures/replacements in the real world). There are however some implications to consider:
-* [What would happen to queries using consistency-level “ALL” during this time?](https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html)
+* [What would happen to queries using consistency-level "ALL" during this time?](https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html)
 * [What happens to the data that should have replicated to the node that was down during this time?](https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_about_hh_c.html?hl=hinted,handoff)
 * [How can we ensure that data is consistent after an event such as this?](https://docs.datastax.com/en/cassandra/2.1/cassandra/operations/opsRepairNodesManualRepair.html?hl=repair)
 * [Is there a less-invasive way to fix this data?](https://docs.datastax.com/en/cassandra/2.1/cassandra/operations/opsRepairNodesReadRepair.html?hl=repair)
@@ -108,7 +108,7 @@ If we can’t introduce cassandra-2 again with the same IP address as before, su
 
 
 #### Assassinate the dead node from the cluster
-One way to handle this scenario is to “assassinate” the dead node from the cluster before attempting to introduce a replacement node. This is potentially ___danger-zone___! Run this command on one of the remaining nodes. It will take about 30s, check the logs afterwards to see what happened. Nodetool status should now say that you have 2 nodes in “UN” state, and nothing else.
+One way to handle this scenario is to "assassinate" the dead node from the cluster before attempting to introduce a replacement node. This is potentially ___danger-zone___! Run this command on one of the remaining nodes. It will take about 30s, check the logs afterwards to see what happened. Nodetool status should now say that you have 2 nodes in "UN" state, and nothing else.
 ```docker exec -it cassandra-1 nodetool assassinate 172.16.0.12```
 
 
@@ -123,7 +123,7 @@ The cluster is now ready for a replacement node to join (after cleaning up some 
 
 
 #### Run a repair to make sure your data is still consistent
-If this cluster had any data in it then we will have of course lost some when we killed cassandra-2. This is why for all but the least important datasets we would always maintain multiple replicas (usually 3). This would allow us to “repair” the data in the cluster by streaming replicas to the new node from its neighbours until we have the desired number of copies again. Try this command on one of the nodes in your cluster.
+If this cluster had any data in it then we will have of course lost some when we killed cassandra-2. This is why for all but the least important datasets we would always maintain multiple replicas (usually 3). This would allow us to "repair" the data in the cluster by streaming replicas to the new node from its neighbours until we have the desired number of copies again. Try this command on one of the nodes in your cluster.
 ```docker exec -it cassandra-1 nodetool repair```
 
 

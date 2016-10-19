@@ -9,7 +9,7 @@ In this exercise you will create a schema, insert data, observe how Cassandra st
 
 Pre-requisites
 --------------
-* A working single-node Cassandra cluster (assuming that the container is called “cassandra-1”).
+* A working single-node Cassandra cluster (assuming that the container is called "cassandra-1").
 Goals
 * To understand how data is written to Cassandra
 * To understand how Cassandra manages data on-disk over time
@@ -21,7 +21,7 @@ Useful Commands
 ### Flush data from memtables/commitlogs to disk
 ``` docker exec -it <container-name/id> nodetool flush <keyspace>```
 
-### Run “cqlsh” in one of your Cassandra containers
+### Run "cqlsh" in one of your Cassandra containers
 ```docker exec -it <container-name/id> cqlsh -C```
 
 ### Find out which files on disk are hosting a table
@@ -33,16 +33,16 @@ Steps
 
 
 ### Prepare a simple schema
-We’ll use a very simple one-to-one table as an example schema based on a user-account database. Schema-definition and data-manipulation is done through the “cqlsh” utility (the command to run this is listed above).
+We’ll use a very simple one-to-one table as an example schema based on a user-account database. Schema-definition and data-manipulation is done through the "cqlsh" utility (the command to run this is listed above).
 
 
 #### Create a keyspace
-This CQL statement will create a new keyspace called “examples” using the simple replication-strategy with one replica.
+This CQL statement will create a new keyspace called "examples" using the simple replication-strategy with one replica.
 ```CREATE KEYSPACE examples WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};```
 
 
 #### Create a Table
-This CQL statement will create a new table called “examples” using the simple replication-strategy with one replica.
+This CQL statement will create a new table called "examples" using the simple replication-strategy with one replica.
 ```
 CREATE TABLE examples.users (
   user_name varchar,
@@ -59,7 +59,7 @@ You can now use the sstableutil command to check which files are holding data fo
 
 
 ### See some data get written to the disk
-You will now insert some test data and see that it gets written to the disk. Again, the CQL statements are run in “cqlsh”.
+You will now insert some test data and see that it gets written to the disk. Again, the CQL statements are run in "cqlsh".
 
 
 #### Insert test data
@@ -68,7 +68,7 @@ Insert one user into the users table. For the benefit of further steps please us
 
 
 #### Check which files are holding your data
-Use the same “sstableutil” command to list the files holding data for this table. Unless you’ve waited a VERY long time since the previous step, there will still be no files on disk for this table. Why has this happened?
+Use the same "sstableutil" command to list the files holding data for this table. Unless you’ve waited a VERY long time since the previous step, there will still be no files on disk for this table. Why has this happened?
 * Your data is currently held [in-memory](https://wiki.apache.org/cassandra/MemtableSSTable) and in the [commit-logs](http://wiki.apache.org/cassandra/Durability).
 * Time and / or throughput will eventually cause this to be flushed to an [SSTable](http://wiki.apache.org/cassandra/ArchitectureSSTable) file.
 * We can also manually cause your data to be [flushed](https://docs.datastax.com/en/cassandra/2.1/cassandra/tools/toolsFlush.html) to disk.
@@ -76,7 +76,7 @@ Use the same “sstableutil” command to list the files holding data for this t
 
 
 #### Flush your data to disk
-Use the “nodetool flush” command to force your table to be flushed to disk, then run the “sstableutil” command again.
+Use the "nodetool flush" command to force your table to be flushed to disk, then run the "sstableutil" command again.
 ```docker exec -it cassandra-1 nodetool flush examples users```
 
 
@@ -85,7 +85,7 @@ You will now have a chance to see how read-queries work against data on disk.
 
 
 ##### Enable Tracing
-CQL / cqlsh offers a powerful “tracing” feature (the closest to an “explain” query you’ll get in Cassandra), which can show how your queries are being fulfilled and help to understand the performance implications of your queries interaction with storage.
+CQL / cqlsh offers a powerful "tracing" feature (the closest to an "explain" query you’ll get in Cassandra), which can show how your queries are being fulfilled and help to understand the performance implications of your queries interaction with storage.
 ```TRACING ON;```
 
 
@@ -100,7 +100,7 @@ Now change the password for the user we created earlier.
 
 
 #### Flush the table data again
-Use the “nodetool flush” command (in another window) to force your table to be flushed to disk, then run the “sstableutil” command again. You’ll see that you now have 2 SSTables (and their associated metadata).
+Use the "nodetool flush" command (in another window) to force your table to be flushed to disk, then run the "sstableutil" command again. You’ll see that you now have 2 SSTables (and their associated metadata).
 ```docker exec -it cassandra-1 nodetool flush examples users```
 
 
@@ -124,7 +124,7 @@ Cassandra will periodically attempt to bring order to the fragmented chaos by co
 In this case you should trigger a manual compaction anyway, to see how it works.
 ```docker exec -it cassandra-1 nodetool compact examples users```
 
-If you run the “sstableutil” command again you will now notice that there is only one file again. It is worth noting that both of the old files (numbers 1 & 2) are completely gone, replaced by number 3.
+If you run the "sstableutil" command again you will now notice that there is only one file again. It is worth noting that both of the old files (numbers 1 & 2) are completely gone, replaced by number 3.
 
 
 #### Read the data again

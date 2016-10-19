@@ -17,7 +17,7 @@ Goals
 
 Pre-requisites
 --------------
-* A working multi-node Cassandra cluster as prepared in the clustering exercise (assuming that the containers are called “cassandra-1", “cassandra-2", “cassandra-3").
+* A working multi-node Cassandra cluster as prepared in the clustering exercise (assuming that the containers are called "cassandra-1", "cassandra-2", "cassandra-3").
 
 
 Useful Commands
@@ -60,7 +60,7 @@ Until I can find the algorithm to calculate a Murmur3 token for a given key, we 
 
 
 #### Find which node owns that token (the hard way)
-Use the nodetool command to print a list of all the token-ranges for your cluster, and find where your token fits in. The number in the “token" column are the upper-boundaries of the token ranges.
+Use the nodetool command to print a list of all the token-ranges for your cluster, and find where your token fits in. The number in the "token" column are the upper-boundaries of the token ranges.
 ```docker exec -it cassandra-1 nodetool ring```
 
 
@@ -70,7 +70,7 @@ Nodetool has a command which allows you to find which node(s) own your data (by 
 
 
 #### Inspect the sstable
-Now you should be able to run bash in the appropriate cassandra container, find the sstable directory for your table, use “apt-get install binutils" to install the “strings" binary, flush the table to disk, and use “strings" to print some contents of the sstable.
+Now you should be able to run bash in the appropriate cassandra container, find the sstable directory for your table, use "apt-get install binutils" to install the "strings" binary, flush the table to disk, and use "strings" to print some contents of the sstable.
 
 ##### Run an interactive bash shell in the container
 ```docker exec -it cassandra-x bash```
@@ -183,7 +183,7 @@ Now that we have data everywhere we can shut down 2 nodes and still run queries 
 
 
 #### Start the nodes again, and change consistency
-Now it is time to try some stronger consistency-levels. Try “QUORUM" and “ALL" with tracing enabled and compare the performance to “ONE".
+Now it is time to try some stronger consistency-levels. Try "QUORUM" and "ALL" with tracing enabled and compare the performance to "ONE".
 ```
 CONSISTENCY QUORUM
 CONSISTENCY ALL
@@ -191,7 +191,7 @@ CONSISTENCY ONE
 ```
 
 #### Perform outage-testing with QUORUM queries
-“QUORUM" queries are really the sweet spot with Cassandra. A combination of QUORUM writes and QUORUM reads allows no room for inconsistency, yet can keep working if a node is down. WIN! 
+"QUORUM" queries are really the sweet spot with Cassandra. A combination of QUORUM writes and QUORUM reads allows no room for inconsistency, yet can keep working if a node is down. WIN! 
 
 __Make sure you start all of your nodes again before the next section__
 

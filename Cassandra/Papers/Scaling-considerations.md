@@ -42,7 +42,13 @@ This is why I say that ```SELECT * FROM <table>;``` should be considered "_illeg
 
 
 ### Secondary indices
+Arbitrary indexing is the thorn in Cassandra's side (in terms of data-modelling). While using partitions and clustering-columns allows some powerful modelling scenarios, it can never allow the type of indexing available in traditional databases.
 
+Cassandra DOES allow "[secondary indexes](https://docs.datastax.com/en/cql/3.0/cql/cql_reference/create_index_r.html)", and to the uninitiated this can appear to be the answer to all data-modelling issues, but I would question whether they should ever be used at all.
+
+The problem with secondary indexes in Cassandra comes down to the way that they are distributed around the cluster. ___Instead of being distributed by the indexed column value, secondary indexes are distributed by the partition-key of the row containing the indexed value___. This means that there is no way to determine which nodes in your cluster are responsble for your indexed value, therefore every node will be involved in fulfilling your queries! In practise this is the same problem as performing table scans - adding more nodes to your cluster will not help your index perform any better, in fact it will be worse.
+
+More is written about this [here](https://pantheon.io/blog/cassandra-scale-problem-secondary-indexes).
 
 
 Scaling for performance
@@ -52,6 +58,7 @@ Scaling for performance
 
 Scaling for storage capacity
 ----------------------------
+
 
 
 Scaling for geographic distribution

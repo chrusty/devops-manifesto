@@ -9,8 +9,6 @@ This document is intended to provide an introduction to some of the concepts of 
 
 Considerations
 --------------
-
-
 ### Work with Cassandra’s strengths
 This is THE most important thing to keep in mind when modelling data for Cassandra. Any distributed database has to make certain compromises which give them special powers (and weaknesses). If you can’t model your data to the strengths of your chosen database then you will almost certainly be setting up some epic-fail for the future. I will outline some solid recipes for Cassandra based on some of these strengths which should be safe to use even at scale.
 

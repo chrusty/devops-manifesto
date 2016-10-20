@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  fluentd:
+    container_name: fluentd
+    image: chrusty/fluentd
+    ports:
+      - 24224/tcp:24224/tcp
+      - 24224/udp:24224/udp
+    volumes:
+      - ./fluent-override.conf:/fluentd/etc/fluent.conf

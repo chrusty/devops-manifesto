@@ -51,7 +51,7 @@ In this section you will interact with the simplest way to model data with Cassa
 Run these commands within CQLSH.
 
 ```
-CREATE KEYSPACE modelling WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '3'};
+CREATE KEYSPACE modelling WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
 
 CREATE TABLE modelling.users (
   user_name varchar,
@@ -73,11 +73,27 @@ INSERT INTO modelling.users (user_name, password, country) VALUES ('thomas', 'sc
 
 
 #### Query the data
-Now perform some queries on the data you've inserted. With tracing enabled you will be able to see how many partitions were involved.
+Now perform some queries on the data you've inserted. With tracing enabled you will be able to see how many partitions were involved. Also take note of any warnings, and the amount of time taken to service each query.
 
+##### Enabled tracing
 ```
 TRACING ON;
+```
+
+##### Single-partition
+```
 SELECT * FROM modelling.users WHERE user_name = 'chris';
+```
+
+##### Table-scan
+```
+SELECT * FROM modelling.users;
+```
+
+##### Filtering
+```
+SELECT * FROM modelling.users WHERE country = 'uk';
+SELECT * FROM modelling.users WHERE country = 'uk' ALLOW FILTERING;
 ```
 
 

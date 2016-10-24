@@ -69,6 +69,7 @@ This is the most simple way to use Cassandra, and it is guaranteed to scale well
 This type of table could be used to host a database of user-accounts where the partition-key is the username, and the columns are the user attributes.
 
 #### Example schema
+
 ```
 CREATE TABLE examples.users (
   user_name varchar,
@@ -79,6 +80,7 @@ CREATE TABLE examples.users (
 ```
 
 #### Example data
+
 ```
 INSERT INTO examples.users (user_name, password, country) VALUES ('chris', 'cruft123', 'nz');
 INSERT INTO examples.users (user_name, password, country) VALUES ('geno', 'letmein', 'uk');
@@ -89,10 +91,12 @@ INSERT INTO examples.users (user_name, password, country) VALUES ('thomas', 'sch
 
 ##### Good:
 This is a simple key/value query, what Cassandra was designed for:
+
 ```SELECT password from examples.users where user_name = 'chris';```
 
 ##### Bad:
 This is a table-scan (involving ALL nodes / partition-ranges in the cluster):
+
 ```SELECT * from examples.users;```
 
 
@@ -103,6 +107,7 @@ This recipe makes use of the _"each partition is like a mini-table with free ord
 This type of table could be used to host a database of user-groups where the partition-key is the group-name, and the columns are the accounts belonging to the group.
 
 #### Example schema
+
 ```
 CREATE TABLE examples.groups (
   group_name varchar,
@@ -114,6 +119,7 @@ CREATE TABLE examples.groups (
 ```
 
 #### Example data
+
 ```
 INSERT INTO examples.groups (group_name, user_name, password, country) VALUES ('admin', 'chris', 'cruft123', 'nz');
 INSERT INTO examples.groups (group_name, user_name, password, country) VALUES ('coffee', 'chris', 'cruft123', 'nz');
@@ -125,10 +131,12 @@ INSERT INTO examples.groups (group_name, user_name, password, country) VALUES ('
 
 ##### Good:
 This is a single-partition query which lists all usernames below "m" in the table-order:
+
 ```SELECT user_name FROM examples.groups WHERE group_name='admin' AND user_name < 'm';```
 
 ##### Bad:
 This is another table-scan (involving ALL nodes / partition-ranges in the cluster):
+
 ```SELECT group_name from examples.groups;```
 
 
@@ -141,6 +149,7 @@ One thing to keep in mind with time-series is the bucket-size. There is no rule-
 Time-series indices are useful for applications such as monitoring, logging, event-processing and comms. Even financial transactions can be best stored as time-series, for example _"show me all of the transactions performed against this account during the month of September 2016"_.
 
 #### Example schema
+
 ```
 CREATE TABLE examples.users_history (
   bucket date,
@@ -156,6 +165,7 @@ WITH CLUSTERING ORDER BY (timestamp DESC);
 ```
 
 #### Example data
+
 ```
 INSERT INTO examples.users_history (bucket, user_name, timestamp, timeuuid, password, country, description) VALUES ('2016-10-04', 'chris', '2016-10-04 12:34', now(), 'cruft123', 'nz', 'user created');
 INSERT INTO examples.users_history (bucket, user_name, timestamp, timeuuid, password, country, description) VALUES (toDate(now()), 'chris', toTimestamp(now()), now(), 'cruft123', 'uk', 'country changed');
@@ -166,8 +176,10 @@ INSERT INTO examples.users_history (bucket, user_name, timestamp, timeuuid, pass
 
 ##### Good:
 This is a single-partition query which lists all history for a user in a given bucket:
+
 ```SELECT * FROM examples.users_history WHERE bucket = toDate(now()) AND user_name = 'chris';```
 
 ##### Not so good:
 This is a multi-partition query which lists all history for a user later than a certain time-stamp:
+
 ```SELECT * FROM examples.users_history WHERE bucket IN ('2016-10-04', toDate(now())) AND user_name = 'chris' AND timestamp > '2016-10-04 13:00';```

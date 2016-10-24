@@ -59,6 +59,7 @@ CREATE TABLE modelling.users (
   country varchar,
   PRIMARY KEY (user_name)
 );
+```
 
 
 #### Insert some data

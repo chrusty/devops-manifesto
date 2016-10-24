@@ -48,7 +48,7 @@ In this section you will interact with the simplest way to model data with Cassa
 
 
 #### Create a schema & test data
-Run these commands within CQLSH.
+Run these commands within CQLSH. _Note that we're using replication_factor=1 here, because this will emphasise the performance impact of your queries later on_.
 
 ```
 CREATE KEYSPACE modelling WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};

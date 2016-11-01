@@ -1,4 +1,4 @@
-﻿Exercise: Data-modelling
+Exercise: Data-modelling
 ========================
 
 
@@ -29,11 +29,15 @@ Useful Commands
 ---------------
 ### Run CQLSH:
 
-```docker exec -it <container-name/id> cqlsh -C```
+```
+docker exec -it <container-name/id> cqlsh -C
+```
 
 ### Enable tracing (CQLSH):
 
-```TRACING ON;```
+```
+TRACING ON;
+```
 
 
 Steps
@@ -192,13 +196,13 @@ Run these commands within CQLSH. _Note that we're using replication_factor=1 her
 CREATE TABLE examples.users_history (
   user_name varchar,
   bucket date,
-  timestamp timestamp,
+  time_stamp timestamp,
   password varchar,
   country varchar,
   description varchar,
-  PRIMARY KEY ((user_name, bucket), timestamp)
+  PRIMARY KEY ((user_name, bucket), time_stamp)
 )
-WITH CLUSTERING ORDER BY (timestamp DESC);
+WITH CLUSTERING ORDER BY (time_stamp DESC);
 ```
 
 
@@ -206,13 +210,13 @@ WITH CLUSTERING ORDER BY (timestamp DESC);
 Insert some user history events into the table you've just made:
 
 ```
-INSERT INTO examples.users_history (bucket, user_name, timestamp, password, country, description) VALUES ('2016-10-04', 'chris', '2016-10-04 12:34', 'cruft123', 'nz', 'user created');
-INSERT INTO examples.users_history (bucket, user_name, timestamp, password, country, description) VALUES (toDate(now()), 'chris', toTimestamp(now()), 'cruft123', 'uk', 'country changed');
-INSERT INTO examples.users_history (bucket, user_name, timestamp, password, country, description) VALUES (toDate(now()), 'chris', toTimestamp(now()), 'newPassw0rd', 'uk', 'password changed');
-INSERT INTO examples.users_history (bucket, user_name, timestamp, password, country, description) VALUES ('2016-10-06', 'thomas', '2016-10-06 15:46', 'schnell123', 'de', 'user created');
-INSERT INTO examples.users_history (bucket, user_name, timestamp, password, country, description) VALUES (toDate(now()), 'thomas', toTimestamp(now()), 'schnell123', 'uk', 'country changed');
-INSERT INTO examples.users_history (bucket, user_name, timestamp, password, country, description) VALUES (toDate(now()), 'thomas', toTimestamp(now()), 'sauerkraut', 'uk', 'password changed');
-INSERT INTO examples.users_history (bucket, user_name, timestamp, password, country, description) VALUES ('2016-12-24', 'thomas', '2016-12-24 09:23', 'currywurst', 'uk', 'merry christmas');
+INSERT INTO examples.users_history (bucket, user_name, time_stamp, password, country, description) VALUES ('2016-10-04', 'chris', '2016-10-04 12:34', 'cruft123', 'nz', 'user created');
+INSERT INTO examples.users_history (bucket, user_name, time_stamp, password, country, description) VALUES (toDate(now()), 'chris', toTimestamp(now()), 'cruft123', 'uk', 'country changed');
+INSERT INTO examples.users_history (bucket, user_name, time_stamp, password, country, description) VALUES (toDate(now()), 'chris', toTimestamp(now()), 'newPassw0rd', 'uk', 'password changed');
+INSERT INTO examples.users_history (bucket, user_name, time_stamp, password, country, description) VALUES ('2016-10-06', 'thomas', '2016-10-06 15:46', 'schnell123', 'de', 'user created');
+INSERT INTO examples.users_history (bucket, user_name, time_stamp, password, country, description) VALUES (toDate(now()), 'thomas', toTimestamp(now()), 'schnell123', 'uk', 'country changed');
+INSERT INTO examples.users_history (bucket, user_name, time_stamp, password, country, description) VALUES (toDate(now()), 'thomas', toTimestamp(now()), 'sauerkraut', 'uk', 'password changed');
+INSERT INTO examples.users_history (bucket, user_name, time_stamp, password, country, description) VALUES ('2016-12-24', 'thomas', '2016-12-24 09:23', 'currywurst', 'uk', 'merry christmas');
 ```
 
 
@@ -249,7 +253,7 @@ SELECT * FROM examples.users_history;
 ##### Filtering
 
 ```
-SELECT * FROM examples.users_history WHERE user_name = 'thomas' AND bucket IN ('2016-10-06', toDate(now()), '2016-12-24') AND timestamp > toUnixTimestamp(toDate(now()));
+SELECT * FROM examples.users_history WHERE user_name = 'thomas' AND bucket IN ('2016-10-06', toDate(now()), '2016-12-24') AND time_stamp > toUnixTimestamp(toDate(now()));
 ```
 
 

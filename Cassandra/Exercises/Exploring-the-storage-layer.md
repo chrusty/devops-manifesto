@@ -46,7 +46,7 @@ This CQL statement will create a new keyspace called "examples" using the simple
 
 
 #### Create a Table
-This CQL statement will create a new table called "examples" using the simple replication-strategy with one replica.
+This CQL statement will create a new table called "users", holding simple user account objects.
 
 ```
 CREATE TABLE examples.users (

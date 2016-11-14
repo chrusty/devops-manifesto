@@ -128,7 +128,6 @@ INSERT INTO examples.users_by_country (user_name, password, country) VALUES ('ni
 INSERT INTO examples.users_by_country (user_name, password, country) VALUES ('boris', 'whatever789', 'uk');
 INSERT INTO examples.users_by_country (user_name, password, country) VALUES ('david', 'bacon4me', 'uk');
 INSERT INTO examples.users_by_country (user_name, password, country) VALUES ('thomas', 'schnell', 'de');
-
 ```
 
 

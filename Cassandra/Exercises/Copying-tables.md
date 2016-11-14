@@ -63,7 +63,7 @@ INSERT INTO examples.playlists (playlist_name, song_title, duration, artist_name
 ### Dump the table to a CSV file on disk
 The following command will dump the contents of the playlists table to disk.
 ```
-COPY playlists to '/playlists.csv';
+COPY examples.playlists to '/playlists.csv';
 ```
 
 
@@ -83,7 +83,7 @@ CREATE TABLE examples.playlists_backup (
 
 #### Copy the CSV data back into it:
 ```
-COPY playlists_backup FROM '/playlists.csv';
+COPY examples.playlists_backup FROM '/playlists.csv';
 ```
 
 

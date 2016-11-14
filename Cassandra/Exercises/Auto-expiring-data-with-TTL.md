@@ -95,6 +95,11 @@ Query the data before the first record expires, then keep querying it until you 
 SELECT user_name, insert_time, ban_reason, ban_duration, TTL(ban_reason) FROM examples.banned_users;
 ```
 
+#### Use a TTL for a specific column (not an entire "row")
+You can even apply TTLs to individual columns. In this instance we'll set a TTL on the "ban_reason" column for the banned user called "chris" (as long as 5 minutes hasn't elapsed since you inserted that user). After 10s you should see the ban_reason column become NULL.
+```
+INSERT INTO examples.banned_users (user_name, ban_reason) VALUES ('chris', 'not such a douche after all') USING TTL 10;
+```
 
 Finishing up
 ------------

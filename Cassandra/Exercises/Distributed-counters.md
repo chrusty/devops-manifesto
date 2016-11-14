@@ -63,11 +63,11 @@ CREATE TABLE examples.hit_counter (
 
 #### Insert test data
 ```
-INSERT INTO examples.hit_counter (web_site, url, hits) VALUES ('cassandra-cruft.com', '/how-to-use-counters.html', +1);
-INSERT INTO examples.hit_counter (web_site, url, hits) VALUES ('cassandra-cruft.com', '/how-to-use-counters.html', +3);
-INSERT INTO examples.hit_counter (web_site, url, hits) VALUES ('google.com', '/search/can-counters-be-subtracted', +6);
-INSERT INTO examples.hit_counter (web_site, url, hits) VALUES ('google.com', '/search/can-counters-be-subtracted', -4);
-INSERT INTO examples.hit_counter (web_site, url, hits) VALUES ('cassandra-cruft.com', '/negative-counters.html', -8);
+UPDATE examples.hit_counter SET hits = hits + 1 WHERE web_site = 'cassandra-cruft.com' AND url = '/how-to-use-counters.html';
+UPDATE examples.hit_counter SET hits = hits + 3 WHERE web_site = 'cassandra-cruft.com' AND url = '/how-to-use-counters.html';
+UPDATE examples.hit_counter SET hits = hits +6 WHERE web_site = 'google.com' AND url = '/search/can-counters-be-subtracted';
+UPDATE examples.hit_counter SET hits = hits - 4 WHERE web_site = 'google.com' AND url = '/search/can-counters-be-subtracted';
+UPDATE examples.hit_counter SET hits = hits - 8 WHERE web_site = 'cassandra-cruft.com' AND url = '/negative-counters.html';
 ```
 
 #### Query the data to see the counts

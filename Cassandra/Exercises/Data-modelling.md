@@ -28,13 +28,11 @@ Pre-requisites
 Useful Commands
 ---------------
 ### Run CQLSH:
-
 ```
 docker exec -it <container-name/id> cqlsh -C
 ```
 
 ### Enable tracing (CQLSH):
-
 ```
 TRACING ON;
 ```
@@ -52,9 +50,8 @@ In this section you will interact with the simplest way to model data with Cassa
 Run these commands within CQLSH. _Note that we're using replication_factor=1 here, because this will emphasise the performance impact of your queries later on_.
 
 Note that the schema uses only one field for the "PRIMARY KEY". It means that for this schema the partition key is just the "user_name".
-
 ```
-CREATE KEYSPACE examples WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
+CREATE KEYSPACE IF NOT EXISTS examples WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
 
 CREATE TABLE examples.users (
   user_name varchar,
@@ -67,7 +64,6 @@ CREATE TABLE examples.users (
 
 #### Insert some data
 Insert some user accounts into the table you've just made:
-
 ```
 INSERT INTO examples.users (user_name, password, country) VALUES ('chris', 'cruft123', 'nz');
 INSERT INTO examples.users (user_name, password, country) VALUES ('geno', 'letmein', 'uk');
@@ -79,25 +75,21 @@ INSERT INTO examples.users (user_name, password, country) VALUES ('thomas', 'sch
 Now perform some queries on the data you've inserted. With tracing enabled you will be able to see how many partitions were involved. Also take note of any warnings, and the amount of time taken to service each query.
 
 ##### Enabled tracing
-
 ```
 TRACING ON;
 ```
 
 ##### Single-partition
-
 ```
 SELECT * FROM examples.users WHERE user_name = 'chris';
 ```
 
 ##### Table-scan
-
 ```
 SELECT * FROM examples.users;
 ```
 
 ##### Filtering
-
 ```
 SELECT * FROM examples.users WHERE country = 'uk';
 SELECT * FROM examples.users WHERE country = 'uk' ALLOW FILTERING;
@@ -118,7 +110,6 @@ Note that the schema now specifies a more complicated "PRIMARY KEY". This exampl
 
 #### Create a schema & test data
 Run these commands within CQLSH. _Note that we're using replication_factor=1 here, because this will emphasise the performance impact of your queries later on_.
-
 ```
 CREATE TABLE examples.users_by_country (
   user_name varchar,
@@ -131,7 +122,6 @@ CREATE TABLE examples.users_by_country (
 
 #### Insert some data
 Insert some user countries into the table you've just made:
-
 ```
 INSERT INTO examples.users_by_country (user_name, password, country) VALUES ('chris', 'cruft123', 'nz');
 INSERT INTO examples.users_by_country (user_name, password, country) VALUES ('nigel', 'europe456', 'uk');
@@ -146,31 +136,26 @@ INSERT INTO examples.users_by_country (user_name, password, country) VALUES ('th
 Now perform some queries on the data you've inserted. With tracing enabled you will be able to see how many partitions were involved. Also take note of any warnings, and the amount of time taken to service each query.
 
 ##### Enabled tracing
-
 ```
 TRACING ON;
 ```
 
 ##### Single-partition
-
 ```
 SELECT * FROM examples.users_by_country WHERE country = 'uk';
 ```
 
 ##### Multi-partition
-
 ```
 SELECT * FROM examples.users_by_country WHERE country IN ('uk', 'de');
 ```
 
 ##### Table-scan
-
 ```
 SELECT * FROM examples.users_by_country;
 ```
 
 ##### Filtering
-
 ```
 SELECT * FROM examples.users_by_country WHERE country = 'uk' AND user_name > 'cameron';
 ```
@@ -191,7 +176,6 @@ In this section you will get a chance to use the time-series index. It builds on
 
 #### Create a schema & test data
 Run these commands within CQLSH. _Note that we're using replication_factor=1 here, because this will emphasise the performance impact of your queries later on_.
-
 ```
 CREATE TABLE examples.users_history (
   user_name varchar,
@@ -208,7 +192,6 @@ WITH CLUSTERING ORDER BY (time_stamp DESC);
 
 #### Insert some data
 Insert some user history events into the table you've just made:
-
 ```
 INSERT INTO examples.users_history (bucket, user_name, time_stamp, password, country, description) VALUES ('2016-10-04', 'chris', '2016-10-04 12:34', 'cruft123', 'nz', 'user created');
 INSERT INTO examples.users_history (bucket, user_name, time_stamp, password, country, description) VALUES (toDate(now()), 'chris', toTimestamp(now()), 'cruft123', 'uk', 'country changed');
@@ -224,20 +207,17 @@ INSERT INTO examples.users_history (bucket, user_name, time_stamp, password, cou
 Now perform some queries on the data you've inserted. With tracing enabled you will be able to see how many partitions were involved. Also take note of any warnings, and the amount of time taken to service each query.
 
 ##### Enabled tracing
-
 ```
 TRACING ON;
 ```
 
 ##### Single-partition
-
 ```
 SELECT * FROM examples.users_history WHERE user_name = 'chris' AND bucket = toDate(now());
 SELECT * FROM examples.users_history WHERE user_name = 'thomas' AND bucket = toDate(now());
 ```
 
 ##### Multi-partition
-
 ```
 SELECT * FROM examples.users_history WHERE user_name = 'chris' AND bucket IN ('2016-10-04', toDate(now()));
 SELECT * FROM examples.users_history WHERE user_name = 'thomas' AND bucket IN ('2016-10-06', toDate(now()), '2016-12-24');
@@ -245,13 +225,11 @@ SELECT * FROM examples.users_history WHERE user_name = 'thomas' AND bucket IN ('
 ```
 
 ##### Table-scan
-
 ```
 SELECT * FROM examples.users_history;
 ```
 
 ##### Filtering
-
 ```
 SELECT * FROM examples.users_history WHERE user_name = 'thomas' AND bucket IN ('2016-10-06', toDate(now()), '2016-12-24') AND time_stamp > toUnixTimestamp(toDate(now()));
 ```

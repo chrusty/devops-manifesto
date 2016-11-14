@@ -18,8 +18,9 @@ Pre-requisites
 
 
 ### Run "cqlsh" in one of your Cassandra containers
-
-```docker exec -it <container-name/id> cqlsh -C```
+```
+docker exec -it <container-name/id> cqlsh -C
+```
 
 
 Background
@@ -42,9 +43,8 @@ We’ll use a very simple one-to-one table as an example schema. Schema-definiti
 
 #### Create a keyspace
 This CQL statement will create a new keyspace called "examples" using the simple replication-strategy with one replica.
-
 ```
-CREATE KEYSPACE examples WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
+CREATE KEYSPACE IF NOT EXISTS examples WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
 ```
 
 #### Create a "locks" table

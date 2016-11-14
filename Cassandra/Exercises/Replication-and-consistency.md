@@ -23,16 +23,19 @@ Pre-requisites
 Useful Commands
 ---------------
 ### Find out which node(s) are responsible for a given key:
-
-```docker exec -it <container-name/id> nodetool getendpoints```
+```
+docker exec -it <container-name/id> nodetool getendpoints
+```
 
 ### Find the token for a partition in CQLSH:
-
-```SELECT TOKEN(user_name) FROM users WHERE user_name='some-user';```
+```
+SELECT TOKEN(user_name) FROM users WHERE user_name='some-user';
+```
 
 ### Find the data-distribution for a keyspace:
-
-```docker exec -it <container-name/id> nodetool status <keyspace>```
+```
+docker exec -it <container-name/id> nodetool status <keyspace>
+```
 
 
 Steps
@@ -45,7 +48,6 @@ The first section works with replication-factor 1, where each partition will ran
 
 #### Create a schema & test data
 Run these commands within CQLSH.
-
 ```
 CREATE KEYSPACE rf_one WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
 CREATE TABLE rf_one.cruft (
@@ -54,37 +56,41 @@ CREATE TABLE rf_one.cruft (
   crufty boolean,
   PRIMARY KEY (kruftkey)
 );
+
 INSERT INTO rf_one.cruft (kruftkey, description, crufty) VALUES ('testing', 'test key', true);
 ```
 
 
 #### Find the token
 Until I can find the algorithm to calculate a Murmur3 token for a given key, we just have to trust CQLSH.
-
-```SELECT TOKEN(kruftkey) FROM rf_one.cruft WHERE kruftkey='testing';```
+```
+SELECT TOKEN(kruftkey) FROM rf_one.cruft WHERE kruftkey='testing';
+```
 
 
 #### Find which node owns that token (the hard way)
 Use the nodetool command to print a list of all the token-ranges for your cluster, and find where your token fits in. The number in the "token" column are the upper-boundaries of the token ranges.
-
-```docker exec -it cassandra-1 nodetool ring```
+```
+docker exec -it cassandra-1 nodetool ring
+```
 
 
 #### Find which node owns that token (the easy way)
 Nodetool has a command which allows you to find which node(s) own your data (by providing the keyspace, table and key).
-
-```nodetool getendpoints rf_one cruft testing```
+```
+nodetool getendpoints rf_one cruft testing
+```
 
 
 #### Inspect the sstable
 Now you should be able to run bash in the appropriate cassandra container, find the sstable directory for your table, use "apt-get install binutils" to install the "strings" binary, flush the table to disk, and use "strings" to print some contents of the sstable.
 
 ##### Run an interactive bash shell in the container
-
-```docker exec -it cassandra-x bash```
+```
+docker exec -it cassandra-x bash
+```
 
 ##### Install strings and check the sstable-file
-
 ```
 apt-get update && apt-get install binutils
 nodetool flush rf_one
@@ -95,7 +101,6 @@ strings /var/lib/cassandra/data/rf_one/cruft-*/mb-1-big-Data.db
 
 #### Insert 9 more rows
 Now use CQLSH to insert 9 more rows (hopefully that is enough rolls of the dice to ensure that you end up with some data on each of your 3 nodes).
-
 ```
 USE rf_one;
 INSERT INTO cruft (kruftkey, description, crufty) VALUES ('testing1', 'test key', true);
@@ -122,7 +127,6 @@ In this section we will experiment with storing 2 replicas instead of one, and s
 
 #### Create a schema & test data
 Note the different "replication_factor".
-
 ```
 CREATE KEYSPACE rf_many WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '2'};
 CREATE TABLE rf_many.cruft (
@@ -131,6 +135,7 @@ CREATE TABLE rf_many.cruft (
   crufty boolean,
   PRIMARY KEY (kruftkey)
 );
+
 INSERT INTO rf_many.cruft (kruftkey, description, crufty) VALUES ('testing', 'test key', true);
 INSERT INTO rf_many.cruft (kruftkey, description, crufty) VALUES ('exercise', 'another test key', true);
 ```
@@ -138,13 +143,13 @@ INSERT INTO rf_many.cruft (kruftkey, description, crufty) VALUES ('exercise', 'a
 
 #### Find which nodes own that token
 Use the same nodetool command to find which node(s) own some of this new data (by providing the keyspace, table and key).
-
-```nodetool getendpoints rf_many cruft testing```
+```
+nodetool getendpoints rf_many cruft testing
+```
 
 
 #### Insert 9 more rows
 Now use CQLSH to insert 9 more rows (hopefully that is enough rolls of the dice to ensure that you end up with some data on each of your 3 nodes).
-
 ```
 USE rf_many;
 INSERT INTO cruft (kruftkey, description, crufty) VALUES ('testing1', 'test key', true);
@@ -161,7 +166,6 @@ INSERT INTO cruft (kruftkey, description, crufty) VALUES ('testing9', 'test key'
 
 #### Shut down one node, try to read your data
 You should be able to read all of your data in the new keyspace, even with one node out of action. This is because the default consistency-level is ONE.
-
 ```
 SELECT * FROM rf_many.cruft WHERE kruftkey = 'testing1';
 SELECT * FROM rf_many.cruft WHERE kruftkey = 'testing2';
@@ -170,7 +174,6 @@ SELECT * FROM rf_many.cruft WHERE kruftkey = 'testing3';
 
 #### Shut down another node, try to read your data
 You should still be able to read some of your data, but there is a percentage which is offline now.
-
 ```
 SELECT * FROM rf_many.cruft WHERE kruftkey = 'testing1';
 SELECT * FROM rf_many.cruft WHERE kruftkey = 'testing2';
@@ -185,24 +188,26 @@ In this section we will take our first steps with both high-availability and str
 
 
 #### Alter the previous keyspace to have one more replica
-
-```ALTER KEYSPACE rf_many WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '3'};```
+```
+ALTER KEYSPACE rf_many WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '3'};
+```
 
 
 #### Repair the keyspace to ensure that we have 3 replicas
-
-```docker exec -it cassandra-1 nodetool repair rf_many```
+```
+docker exec -it cassandra-1 nodetool repair rf_many
+```
 
 
 #### Shut down 2 nodes and prove that you can still query all of the data
 Now that we have data everywhere we can shut down 2 nodes and still run queries at CL=1.
-
-```docker stop cassandra-2 cassandra-3```
+```
+docker stop cassandra-2 cassandra-3
+```
 
 
 #### Start the nodes again, and change consistency
 Now it is time to try some stronger consistency-levels. Try "QUORUM" and "ALL" with tracing enabled and compare the performance to "ONE".
-
 ```
 CONSISTENCY QUORUM
 CONSISTENCY ALL
@@ -223,24 +228,24 @@ We will now try to cause some data-inconsistency, and see how Cassandra copes.
 We will manually delete the sstables for the rf_many.cruft table we created earlier, then restart cassandra to make it come up with no data for that table.
 
 ##### Run an interactive bash shell in the container
-
-```docker exec -it cassandra-3 bash```
+```
+docker exec -it cassandra-3 bash
+```
 
 ##### Delete the sstables
-
 ```
 rm /var/lib/cassandra/data/rf_many/cruft-*/*
 exit
 ```
 
 ##### Restart the container
-
-```docker restart cassandra-3```
+```
+docker restart cassandra-3
+```
 
 
 #### Query the data with CL=one
 Once cassandra has loaded, use cqlsh to query the row we inserted before. You will probably not get a response!
-
 ```
 CONSISTENCY ONE
 SELECT * FROM rf_many.cruft WHERE kruftkey = 'testing';
@@ -249,7 +254,6 @@ SELECT * FROM rf_many.cruft WHERE kruftkey = 'testing';
 
 #### Query the data with CL=quorum
 All is not lost... we can use a higher consistency-level.
-
 ```
 CONSISTENCY QUORUM
 SELECT * FROM rf_many.cruft WHERE kruftkey = 'testing';
@@ -258,7 +262,6 @@ SELECT * FROM rf_many.cruft WHERE kruftkey = 'testing';
 
 #### Try again with CL=one
 And now Cassandra’s background consistency-reconciliation will have permanently repaired this record on cassandra-3.
-
 ```
 CONSISTENCY ONE
 SELECT * FROM rf_many.cruft WHERE kruftkey = 'testing';
@@ -267,13 +270,13 @@ SELECT * FROM rf_many.cruft WHERE kruftkey = 'testing';
 
 #### Repair the rest of the data
 Now use the nodetool repair command to repair the table before checking the other rows.
-
-```nodetool repair rf_many cruft -full```
+```
+nodetool repair rf_many cruft -full
+```
 
 
 #### Check another row
 Now check one of the other rows. After being repaired it should return data the first time.
-
 ```
 CONSISTENCY ONE
 SELECT * FROM rf_many.cruft WHERE kruftkey = 'exercise';

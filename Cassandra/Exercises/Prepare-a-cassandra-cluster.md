@@ -71,7 +71,6 @@ docker exec -it cassandra-1 nodetool status
 
 #### Introduce a second node
 If your single-node cluster is running then you should now be able to introduce a second node. Again watch the logs to see how the node goes about joining, and use nodetool to check the cluster membership (note that you can do this on either of the nodes). Notice how we can pass configuration options to Cassandra with the Docker run command (in this case the [seed-list](https://docs.datastax.com/en/cassandra/2.1/cassandra/configuration/configCassandra_yaml_r.html#reference_ds_qfg_n1r_1k__seed_provider)). If you run "nodetool status" quick enough you may get to see the original node in "UN" status, and the new one in "UJ" (UP and JOINING) before they eventually both report "UN".
-
 ```
 docker run --net=cassandra --ip=172.16.0.12 --name=cassandra-2 -d -e CASSANDRA_SEEDS=172.16.0.11 cassandra:3.7
 ```
@@ -79,7 +78,6 @@ docker run --net=cassandra --ip=172.16.0.12 --name=cassandra-2 -d -e CASSANDRA_S
 
 #### Introduce a third node
 If your two-node cluster looks good then you can proceed with adding a third node. Note that this time we’re using cassandra-2 as the seed. Since all nodes are peers, any active node can provide seed information.
-
 ```
 docker run --net=cassandra --ip=172.16.0.13 --name cassandra-3 -d -e CASSANDRA_SEEDS=172.16.0.12 cassandra:3.7
 ```
@@ -91,7 +89,6 @@ This will show you how a Cassandra cluster managed nodes going offline and comin
 
 #### Stop one of the nodes
 Use the Docker stop command to bring cassandra-2 down, then use the nodetool status command on the remaining nodes to see what they think is going on. Also check the logs on the remaining machines and find any relevant messages.
-
 ```
 docker stop cassandra-2
 ```
@@ -99,7 +96,6 @@ docker stop cassandra-2
 
 #### Start the node back up again
 You can now use the docker start command to bring the cassandra-2 container back to life (its state will have been kept on disk and it should quickly come back up). Use the status command to show that its back, and again check the logs on the other nodes to see what they’ve said.
-
 ```
 docker start cassandra-2
 ```
@@ -118,7 +114,6 @@ We will simulate a complete hardware failure of one of the cluster nodes, and re
 
 #### Stop a node and delete the container
 Let’s pick on cassandra-2 again. The following commands will stop the container and delete it from Docker. Once that is done use nodetool to display the cluster status.
-
 ```
 docker stop cassandra-2
 docker rm cassandra-2
@@ -126,7 +121,6 @@ docker rm cassandra-2
 
 #### Attempt to bring up a replacement
 The same command we originally used to bring up cassandra-2 can be used again. Don’t wait too long for it to join though, because it won’t actually succeed! Check the logs for the new cassandra-2 container to find out why.
-
 ```
 docker run --net=cassandra --ip=172.16.0.12 --name=cassandra-2 -d -e CASSANDRA_SEEDS=172.16.0.11 cassandra:3.7
 ```
@@ -134,7 +128,6 @@ docker run --net=cassandra --ip=172.16.0.12 --name=cassandra-2 -d -e CASSANDRA_S
 
 #### Attempt to bring up an additional node instead
 If we can’t introduce cassandra-2 again with the same IP address as before, surely we could just choose to bring in Cassandra-4 instead? No, this won’t work either. Check the logs to find out why.
-
 ```
 docker run --net=cassandra --ip=172.16.0.14 --name cassandra-4 -d -e CASSANDRA_SEEDS=172.16.0.11 cassandra:3.7
 ```
@@ -142,7 +135,6 @@ docker run --net=cassandra --ip=172.16.0.14 --name cassandra-4 -d -e CASSANDRA_S
 
 #### Assassinate the dead node from the cluster
 One way to handle this scenario is to "assassinate" the dead node from the cluster before attempting to introduce a replacement node. This is potentially ___danger-zone___! Run this command on one of the remaining nodes. It will take about 30s, check the logs afterwards to see what happened. Nodetool status should now say that you have 2 nodes in "UN" state, and nothing else.
-
 ```
 docker exec -it cassandra-1 nodetool assassinate 172.16.0.12
 ```
@@ -152,13 +144,11 @@ docker exec -it cassandra-1 nodetool assassinate 172.16.0.12
 The cluster is now ready for a replacement node to join (after cleaning up some junk first).
 
 ##### Delete cassandra-2 and cassandra-4
-
 ```
 docker rm cassandra-2 cassandra-4
 ```
 
 ##### Start a new cassandra-2
-
 ```
 docker run --net=cassandra --ip=172.16.0.12 --name=cassandra-2 -d -e CASSANDRA_SEEDS=172.16.0.11 cassandra:3.7
 ```
@@ -166,7 +156,6 @@ docker run --net=cassandra --ip=172.16.0.12 --name=cassandra-2 -d -e CASSANDRA_S
 
 #### Run a repair to make sure your data is still consistent
 If this cluster had any data in it then we will have of course lost some when we killed cassandra-2. This is why for all but the least important datasets we would always maintain multiple replicas (usually 3). This would allow us to "repair" the data in the cluster by streaming replicas to the new node from its neighbours until we have the desired number of copies again. Try this command on one of the nodes in your cluster.
-
 ```
 docker exec -it cassandra-1 nodetool repair
 ```
@@ -178,7 +167,6 @@ At this point you should have a healthy 3-node cluster again. This exercise was 
 
 
 You can now simply stop and remove the Cassandra containers if you don’t want them any more, then finally remove the network we created at the beginning.
-
 ```
 docker stop cassandra-1 cassandra-2 cassandra-3
 docker rm cassandra-1 cassandra-2 cassandra-3

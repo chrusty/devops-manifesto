@@ -17,7 +17,9 @@ Pre-requisites
 
 
 ### Run "cqlsh" in one of your Cassandra containers
-`docker exec -it <container-name/id> cqlsh -C`
+```
+docker exec -it <container-name/id> cqlsh -C
+```
 
 
 Steps
@@ -30,9 +32,8 @@ We’ll use a very simple one-to-one table as an example schema. Schema-definiti
 
 #### Create a keyspace
 This CQL statement will create a new keyspace called "examples" using the simple replication-strategy with one replica.
-
 ```
-CREATE KEYSPACE examples WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
+CREATE KEYSPACE IF NOT EXISTS examples WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
 ```
 
 
@@ -50,14 +51,20 @@ CREATE TABLE examples.temporary_access (
 ```
 
 #### Insert test data
-`INSERT INTO examples.temporary_access (access_token, insert_time) VALUES ('token1', toTimestamp(now()));`
+```
+INSERT INTO examples.temporary_access (access_token, insert_time) VALUES ('token1', toTimestamp(now()));
+```
 
 #### Wait 10s then insert some more
-`INSERT INTO examples.temporary_access (access_token, insert_time) VALUES ('token2', toTimestamp(now()));`
+```
+INSERT INTO examples.temporary_access (access_token, insert_time) VALUES ('token2', toTimestamp(now()));
+```
 
 #### Query the data to prove that it is there
-Query the data before the first record expires, then keep querying it until you see them fall out of the result set.
-`SELECT * FROM examples.temporary_access;`
+Query the data before the first record expires, then keep querying it until you see them fall out of the result set. Note that we can query the TTL for columns:
+```
+SELECT access_token, insert_time, TTL(insert_time) FROM examples.temporary_access;
+```
 
 
 ### Arbitrary TTL
@@ -65,7 +72,6 @@ You will now insert some test data and see it expire using arbitrary TTLs. Again
 
 #### Create a "banned-users" table
 This CQL statement will create a new table called "banned_users", which will hold a list of banned users. Bans will expire after an arbitrary amount of time (defined when we insert data).
-
 ```
 CREATE TABLE examples.banned_users (
   user_name varchar,
@@ -85,7 +91,9 @@ INSERT INTO examples.banned_users (user_name, insert_time, ban_reason, ban_durat
 
 #### Query the data to prove that it is there
 Query the data before the first record expires, then keep querying it until you see them fall out of the result set.
-`SELECT * FROM examples.banned_users;`
+```
+SELECT user_name, insert_time, ban_reason, ban_duration, TTL(ban_reason) FROM examples.banned_users;
+```
 
 
 Finishing up

@@ -20,20 +20,16 @@ Pre-requisites
 Useful Commands
 ---------------
 ### Get the logs from a container
-
-```docker logs <container-name/id>```
+`docker logs <container-name/id>`
 
 ### Run "nodetool status" in one of your Cassandra containers
-
-```docker exec -it <container-name/id> nodetool status```
+`docker exec -it <container-name/id> nodetool status`
 
 ### Run "cqlsh" in one of your Cassandra containers
-
-```docker exec -it <container-name/id> cqlsh```
+`docker exec -it <container-name/id> cqlsh`
 
 ### Run "bash" in one of your Cassandra containers
-
-```docker exec -it <container-name/id> bash```
+`docker exec -it <container-name/id> bash`
 
 
 Steps
@@ -46,20 +42,17 @@ This procedure will quickly get a 3-node Cassandra cluster up and running on you
 
 #### Create a network for your Cassandra containers
 The first thing to do is to make a docker network specifically for Cassandra containers (so we can have some control over IP addressing).
-
-```docker network create --subnet=172.16.0.0/24 cassandra```
+`docker network create --subnet=172.16.0.0/24 cassandra`
 
 
 #### Bring up a single-node cluster
 Now you can bring up your first Cassandra node (172.16.0.11). This container will be called "cassandra-1".
-
-```docker run --net=cassandra --ip=172.16.0.11 --name=cassandra-1 -d cassandra:3.7```
+`docker run --net=cassandra --ip=172.16.0.11 --name=cassandra-1 -d cassandra:3.7`
 
 
 #### Check the status of your single-node cluster
 Your new node will take a couple of seconds to come up. Check the docker logs for the container, and once it looks like it is running you can use nodetool to print out the cluster membership (at this stage you should only see one node). Any node with a "UN" status is UP and NORMAL.
-
-```docker exec -it cassandra-1 nodetool status```
+`docker exec -it cassandra-1 nodetool status`
 
 
 #### Introduce a second node

@@ -48,7 +48,7 @@ CREATE KEYSPACE IF NOT EXISTS examples WITH replication = {'class': 'SimpleStrat
 ```
 
 #### Create a "hit-counter" table
-This CQL statement will create a new table called "hit_counter", holding access tokens which expire after 60s using a default TTL for the table.
+This CQL statement will create a new table called "hit_counter", holding a list of hits for imaginary WWW requests.
 ```
 CREATE TABLE examples.hit_counter (
   web_site varchar,

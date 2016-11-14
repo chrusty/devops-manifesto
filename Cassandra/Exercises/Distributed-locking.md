@@ -28,7 +28,7 @@ Background
 
 Sometimes locks are required in order to protect shared resources, to prevent race-conditions, or to elect leaders. With monolithic applications it is possible to do this using a mutex, but in distributed systems this requires some kind of co-ordination service.
 
-There is a known pattern to do this within Cassandra, effectively a hack on the "IF NOT EXISTS" clause in CQL. Obviously to be of any use (and safety) any locking recipe will need to invole a QUORUM of your nodes, incurring all of the known performance penalties of high consistency levels.
+There is a known pattern to do this within Cassandra, effectively a hack on the "IF NOT EXISTS" clause in CQL. Obviously to be of any use (and safety) any locking recipe will need to invole a QUORUM of your nodes, incurring all of the known performance penalties of high consistency levels. I encourage you to re-run these sample queries with tracing enabled (after you've gone through the recipe the first time) - this should indicate the added complexity of "IF NOT EXISTS".
 
 __My advice is to use this recipe with caution, and certainly not at high volumes.__
 
@@ -70,8 +70,15 @@ INSERT INTO examples.locks (lock_name, client_id) VALUES ('region-master', 'appl
 ```
 
 #### Renew the lock
+You can "renew" the lease on the lock by re-issuing the insert statement __without the `IF NOT EXISTS` clause__.
+```
+UPDATE examples.locks SET client_id = 'application-server-3' WHERE lock_name = 'region-master' IF client_id = 'application-server-3';
+```
 
 #### Release the lock
+```
+DELETE FROM examples.locks WHERE lock_name = 'region-master' IF client_id =  'application-server-3';
+```
 
 
 Finishing up

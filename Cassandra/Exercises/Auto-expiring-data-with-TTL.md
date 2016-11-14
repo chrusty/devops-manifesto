@@ -17,8 +17,7 @@ Pre-requisites
 
 
 ### Run "cqlsh" in one of your Cassandra containers
-
-```docker exec -it <container-name/id> cqlsh -C```
+`docker exec -it <container-name/id> cqlsh -C`
 
 
 Steps
@@ -51,20 +50,14 @@ CREATE TABLE examples.temporary_access (
 ```
 
 #### Insert test data
-```
-INSERT INTO examples.temporary_access (access_token, insert_time) VALUES ('token1', toTimestamp(now()));
-```
+`INSERT INTO examples.temporary_access (access_token, insert_time) VALUES ('token1', toTimestamp(now()));`
 
 #### Wait 10s then insert some more
-```
-INSERT INTO examples.temporary_access (access_token, insert_time) VALUES ('token2', toTimestamp(now()));
-```
+`INSERT INTO examples.temporary_access (access_token, insert_time) VALUES ('token2', toTimestamp(now()));`
 
 #### Query the data to prove that it is there
 Query the data before the first record expires, then keep querying it until you see them fall out of the result set.
-```
-SELECT * FROM examples.temporary_access;
-```
+`SELECT * FROM examples.temporary_access;`
 
 
 ### Arbitrary TTL
@@ -92,9 +85,7 @@ INSERT INTO examples.banned_users (user_name, insert_time, ban_reason, ban_durat
 
 #### Query the data to prove that it is there
 Query the data before the first record expires, then keep querying it until you see them fall out of the result set.
-```
-SELECT * FROM examples.banned_users;
-```
+`SELECT * FROM examples.banned_users;`
 
 
 Finishing up

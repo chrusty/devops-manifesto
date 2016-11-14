@@ -103,4 +103,4 @@ INSERT INTO examples.banned_users (user_name, ban_reason) VALUES ('chris', 'not 
 
 Finishing up
 ------------
-You have just witnessed how data can be automatically aged-out of Cassandra. Bear in mind that data isn't actually removed once the TTL has expired... it is simply omitted from query results. It will in fact live on-disk for the duration of the grace-period, then removed during a compaction or repair after that time has elapsed.
+You have just witnessed how data can be automatically aged-out of Cassandra. Bear in mind that data isn't actually removed once the TTL has expired... it is simply omitted from query results. It will in fact live on-disk for the duration of the grace-period, then be removed during a compaction or repair after that time has elapsed.
